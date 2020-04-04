@@ -1,0 +1,8 @@
+﻿  Source.cpp
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(10,25): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(12,4): warning C4834: discarding return value of function with 'nodiscard' attribute
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(30,24): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(49,1): error C2679: binary '+': no operator found which takes a right-hand operand of type 'std::bitset<10>' (or there is no acceptable conversion)
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(53,10): message : could be 'BigInt &BigInt::operator +(BigInt &)'
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(49,1): message : while trying to match the argument list '(BigInt, std::bitset<10>)'
+C:\Users\Marina\source\repos\BigInt\BigInt\BigInt.h(57,24): warning C4018: '<': signed/unsigned mismatch
