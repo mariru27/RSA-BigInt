@@ -1,80 +1,126 @@
 #pragma once
-#include<bitset>
+#include <array>
+#include <vector>
+
+#define SIZE 1024
 
 class BigInt
 {
-	std::bitset<10> bitsContainer;
-
-	void complement()
-	{
-		for (auto it =  1; it <= bitsContainer.size(); ++it)
-		{
-			~(bitsContainer[it]);
-		}
-	}
-
+	std::vector<int> container;
 public:
-
-	BigInt()
+	BigInt(int number = 0)
 	{
-		bitsContainer.reset();
+		while (container.size() <= SIZE)
+		{
+			container.push_back(number % 10);
+			number = number / 10;
+		}
+		std::reverse(container.begin(), container.end());
 	}
-	void setBit(int pozition, int value = 1)
+	BigInt(BigInt& other)
 	{
-		bitsContainer[pozition] = value;
+		for (auto& i : other.container)
+		{
+			container.push_back(i);
+		}
 	}
 	void print()
 	{
-		int sum = 0;
-		int pozition = 1;
-		for (auto it = 1; it < bitsContainer.size(); ++it)
+		for (auto& i : container) 
 		{
-			sum += bitsContainer[it]*pozition;
-			pozition = pozition << 1;
+			std::cout << i;
 		}
-		std::cout << sum ;
 	}
-
-	BigInt& operator -(BigInt other)
+	void move(std::vector<int>& v1, int n = 0)
 	{
-		BigInt bitsResult;
-		BigInt one;
-
-		//one represent number one on bits
-		one.setBit(1);
-		other.complement();
-
-		//add one
-		bitsResult = other + one;
-		BigInt a = bitsResult.bitsContainer + bitsContainer;
-		return bitsResult;
-	}
-
-	BigInt& operator +(BigInt& other)
-	{
-		BigInt bitsResult;
-		int remember = 0;
-		for (auto it = 1; it < this->bitsContainer.size(); ++it)
+		std::vector<int> v2 = v1;
+		n = SIZE - n;
+		for (int i = SIZE; i > n; --i)
 		{
-			int result = this->bitsContainer[it] + other.bitsContainer[it];
-			result += remember;
-			bitsResult.bitsContainer[it] = result;
-			switch (result)
+			v1[i] = 0;
+		}
+
+		int j = SIZE;
+		for (int i = n; i > 0; --i)
+		{
+			v1[i] = v2[j];
+			--j;
+		}
+	}
+	
+	BigInt operator *(BigInt& b1)
+	{
+		BigInt result;
+		int remember = 0;
+		BigInt a, b, c;
+		for (std::size_t i = SIZE; i > 0; --i)
+		{
+			a.container.clear();
+			for (std::size_t j = SIZE; j > 0; --j)
 			{
-			case 1:bitsResult.bitsContainer[it] = result;
+				if ((b1.container[i] * container[j]) + remember >= 10)
+				{
+					int r = (b1.container[i] * container[j]) + remember;
+					a.container.push_back(r % 10);
+					remember = r / 10;
+				}
+				else
+				{
+					a.container.push_back((b1.container[i] * container[j]) + remember); 
+					remember = 0; 
+				}
+			}
+			a.container.push_back(0);
+			std::reverse(a.container.begin(), a.container.end());
+			move(a.container, SIZE - i);
+			b = b + a;
+		}
+		return b;
+	}
+	BigInt operator +(BigInt& b1)
+	{
+		int remember = 0;
+		BigInt result;
+		result.container.clear();
+		for (std::size_t i = SIZE; i > 0; --i)
+		{
+			if (b1.container[i] + container[i] + remember < 10)
+			{
+				result.container.push_back(b1.container[i] + container[i] + remember);
 				remember = 0;
-				continue;
-			case 2:
-				bitsResult.bitsContainer[it] = 0;
-				remember = 1;
-				continue;
-			case 3:
-				remember = 1;
-				continue;
-			default:
-				break;
+			}
+			else
+			{
+				int a = b1.container[i] + container[i] + remember;
+				result.container.push_back(a % 10);
+				remember = a / 10;
 			}
 		}
-		return bitsResult;
+		result.container.push_back(0);
+		std::reverse(result.container.begin(), result.container.end());
+		return result;
 	}
+	BigInt operator -(BigInt& b1)
+	{
+		BigInt result;
+		result.container.clear();
+		for (std::size_t i = SIZE; i != 0; --i)
+		{
+			if (container[i] - b1.container[i] >= 0)
+			{
+				result.container.push_back(container[i] - b1.container[i]);
+			}
+			else
+			{
+				container[i - 1]  -= 1;
+				int a = 10 + container[i];
+				result.container.push_back(a - b1.container[i]);
+			}
+		}
+		std::reverse(result.container.begin(), result.container.end());
+		return result;
+	}
+	
+
+
 };
