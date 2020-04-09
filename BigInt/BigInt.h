@@ -1,9 +1,9 @@
 #pragma once
-#include <array>
+#include <string>
 #include <algorithm>
 #include <vector>
 
-#define SIZE 1024
+#define SIZE 310
 
 class BigInt
 {
@@ -94,6 +94,11 @@ class BigInt
 		move(result.container,SIZE - i);
 		result = result + multiple;
 	}
+	void fillVector(std::vector<int>& v)
+	{
+		for (int i = v.size() - 1; i < SIZE; ++i)
+			v.push_back(0);
+	}
 public:
 	void setBigInt(int number = 0)
 	{
@@ -150,18 +155,19 @@ public:
 		BigInt a, b, c;
 		for (std::size_t i = SIZE; i > 0; --i)
 		{
+			if (firstDifferentNr(b1.container) - 1 == i)
+				break;
 			a.container.clear();
 			for (std::size_t j = SIZE; j > 0; --j)
 			{
-				//if (firstDifferentNr(container) == j)
-				//	break;
+
+				if (firstDifferentNr(container) - 1 == j)
+					break;
 				if ((b1.container[i] * container[j]) + remember >= 10)
 				{
 					int r = (b1.container[i] * container[j]) + remember;
 					a.container.push_back(r % 10);
 					remember = r / 10;
-					////////////////////////////////////////////////////////////////////
-
 				}
 				else
 				{
@@ -169,7 +175,7 @@ public:
 					remember = 0; 
 				}
 			}
-			a.container.push_back(0);
+			fillVector(a.container);
 			std::reverse(a.container.begin(), a.container.end());
 			move(a.container, SIZE - i);
 			b = b + a;
@@ -342,9 +348,37 @@ public:
 				saveMultiple(result, multiple);
 				multiple = multiple * b1;
 				a = a - multiple;
-				//eraseZerosFromBack(a.container);
 			}
 		}
 		return a;
 	}
+
+
+	friend std::ostream& operator <<(std::ostream& out, const BigInt& b)
+	{
+		for (auto& i : b.container)
+		{
+			out << i;
+		}
+		return out;
+		
+	}
+
+	friend std::istream& operator >>(std::istream& in, BigInt& b)
+	{
+		b.container.clear();
+		std::string str;
+		in >> str;
+
+		for (auto& i : str)
+		{
+			if (i >= '0' && i <= '9')
+				b.container.push_back(i - 48);
+		}
+		for (int i = b.container.size() - 1; i < SIZE; ++i)
+			b.container.push_back(0);
+		std::reverse(b.container.begin(), b.container.end());
+		return in;
+	}
+	
 };

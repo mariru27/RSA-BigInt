@@ -1,26 +1,21 @@
 #include <iostream>
 #include <string>
+//here--------------------------------------------------
 #include "BigInt.h"
+//------------------------------------------------------
 #include<bitset>
 #include <array>
-
-//#include "bits/stdc++.h"
 
 int main()
 {
 	std::string message{ "message" };
 	std::size_t str_hash = std::hash<std::string>{}(message);
-	std::cout << str_hash << std::endl;
-	BigInt a(2) , b(1);
-
+	//std::cout << str_hash << std::endl;
+	//BigInt a(23312421), b(32872113);	
+	BigInt a, b;
+	std::cin >> a >> b;
 	BigInt c;
-	
-	c = a * b;
-	c.print();
-
-	//std::cout << 154 / 3;
-
-
+	std::cout << std::endl << a*b;
 	std::cout << std::endl;
 	return 0;
 }
