@@ -17,18 +17,34 @@ class BigInt
 		}
 		return true;
 	}
+	bool isEmpty(BigInt& Container)
+	{
+		for (auto& i : Container.container)
+		{
+			if (i != 0)
+				return false;
+		}
+		return true;
+	}
 	int firstDifferentNr(std::vector<int>& v, int nr = 0)
 	{
-		for (int i = SIZE; i != 0; --i)
+		for (int i = 0; i <= SIZE; ++i)
 		{
-			if (v[i] == nr && v[i - 1] == nr)
-				return i;
+			if (v[i] != nr && v[i - 1] == nr)
+				return i-1;
 		}
 		return 0;
 	}
 	bool allZeros()
 	{
 		bool zeros = std::all_of(container.begin(), container.end(), [](int i) { return i == 0; });
+		return zeros;
+	}
+	bool _allZeros(int abegin = SIZE, int aend = SIZE)
+	{
+		if(SIZE != abegin)
+			++abegin;
+		bool zeros = std::all_of(container.begin()+ abegin, container.begin()+aend+1, [](int i) { return i == 0; });
 		return zeros;
 	}
 	BigInt findMultiple(BigInt& b, BigInt& a)
@@ -148,7 +164,7 @@ public:
 			std::cout << i;
 		}
 	}
-	BigInt operator *(BigInt& b1)
+	BigInt operator *(BigInt b1)
 	{
 		BigInt result;
 		int remember = 0;
@@ -277,37 +293,59 @@ public:
 		}
 		return container[x] > b.container[x];
 	}
-	BigInt operator ^(BigInt b1)
+	BigInt operator ^(BigInt& power)
 	{
-		BigInt result(1);
-		BigInt a(container);
-		BigInt end(0);
-		for (; b1 != end; --b1)
+		BigInt result(1), one(1), two(2);
+		BigInt zero, number(container);
+		while (power != zero)
 		{
-			result = result * a;
+			if (power % two == one)
+				result = (result * number);
+			number = (number * number) ;
+			power = power / two;
 		}
 		return result;
+
 	}
 	BigInt operator /(BigInt& b1)
 	{
 		BigInt result;
 		int it = firstDifferentNr(container)+1;
 		BigInt a, multiple;
+		BigInt Container(container);
+		BigInt zero;
+		int size = SIZE - actualSize(Container.container);
+		bool getDownDigit = false;
 		while (true)
 		{
-			if (isEmpty(container) == true && a < b1)
+			if (isEmpty(Container.container) == true && a < b1 && size==0)
 				break;
-			if (a < b1)
+			//if (size == 0)
+			//	break;
+			if (a < b1 && size > 0)
 			{
 				a.move(a.container, 1);
 				if (it <= SIZE)
 				{
-					a.container[SIZE] = container[it];
-					container[it] = 0;
+					if (getDownDigit == true)
+						move(result.container, 1);
+					a.container[SIZE] = Container.container[it];
+					Container.container[it] = 0;
+					//if (a != zero)
+					//{
+
+						--size;
+					//}
+					//if (size > 0 && a == zero)
+					//{
+					//		move(result.container, size);
+					//		size = 0;
+					//}
 					++it;
 				}
 				else 
 					break;
+				getDownDigit = true;
 			}
 			else
 			{
@@ -315,7 +353,20 @@ public:
 				saveMultiple(result,multiple);
 				multiple = multiple * b1;
 				a = a - multiple;
+				
 				//eraseZerosFromBack(a.container);
+				//if (size > 0 && a == zero)
+					//if (_allZeros(SIZE - size - 2) == true)
+					//{
+					//	move(result.container, size);
+					//	size = 0;
+					//}
+				if (_allZeros(SIZE - size) == true &&  a==zero)
+				{
+					move(result.container, size);
+					size = 0;
+				}
+				getDownDigit = false;
 			}
 		}
 		return result;
@@ -326,17 +377,21 @@ public:
 		BigInt result;
 		int it = firstDifferentNr(container) + 1;
 		BigInt a, multiple;
+		BigInt Container(container);
+		int size = SIZE - actualSize(Container.container);
+
 		while (true)
 		{
-			if (isEmpty(container) == true && a < b1)
+			if (isEmpty(Container) == true && a < b1 && size == 0)
 				break;
 			if (a < b1)
 			{
 				a.move(a.container, 1);
 				if (it <= SIZE)
 				{
-					a.container[SIZE] = container[it];
-					container[it] = 0;
+					a.container[SIZE] = Container.container[it];
+					Container.container[it] = 0;
+					--size;
 					++it;
 				}
 				else
@@ -348,12 +403,11 @@ public:
 				saveMultiple(result, multiple);
 				multiple = multiple * b1;
 				a = a - multiple;
+
 			}
 		}
 		return a;
 	}
-
-
 	friend std::ostream& operator <<(std::ostream& out, const BigInt& b)
 	{
 		for (auto& i : b.container)
