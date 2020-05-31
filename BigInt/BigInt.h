@@ -1,9 +1,11 @@
+
 #pragma once
 #include <string>
 #include <algorithm>
+#include <random>
 #include <vector>
 
-#define SIZE 310
+#define SIZE 10
 
 class BigInt
 {
@@ -31,7 +33,7 @@ class BigInt
 		for (int i = 0; i <= SIZE; ++i)
 		{
 			if (v[i] != nr && v[i - 1] == nr)
-				return i-1;
+				return i - 1;
 		}
 		return 0;
 	}
@@ -42,16 +44,16 @@ class BigInt
 	}
 	bool _allZeros(int abegin = SIZE, int aend = SIZE)
 	{
-		if(SIZE != abegin)
+		if (SIZE != abegin)
 			++abegin;
-		bool zeros = std::all_of(container.begin()+ abegin, container.begin()+aend+1, [](int i) { return i == 0; });
+		bool zeros = std::all_of(container.begin() + abegin, container.begin() + aend + 1, [](int i) { return i == 0; });
 		return zeros;
 	}
 	BigInt findMultiple(BigInt& b, BigInt& a)
 	{
 		BigInt multiple(a);
 		BigInt index(1);
-		while (multiple * index < b || multiple*index == b)
+		while (multiple* index < b || multiple * index == b)
 		{
 			++index;
 		}
@@ -103,11 +105,13 @@ class BigInt
 	{
 		return firstDifferentNr(v);
 	}
-	void saveMultiple(BigInt& result,BigInt& multiple)
+	void saveMultiple(BigInt& result, BigInt& multiple)
 	{
-		
+
 		int i = actualSize(multiple.container);
-		move(result.container,SIZE - i);
+		if (i == 0)
+			i = SIZE - 1;
+		move(result.container, SIZE - i);
 		result = result + multiple;
 	}
 	void fillVector(std::vector<int>& v)
@@ -159,7 +163,7 @@ public:
 	}
 	void print()
 	{
-		for (auto& i : container) 
+		for (auto& i : container)
 		{
 			std::cout << i;
 		}
@@ -187,8 +191,8 @@ public:
 				}
 				else
 				{
-					a.container.push_back((b1.container[i] * container[j]) + remember); 
-					remember = 0; 
+					a.container.push_back((b1.container[i] * container[j]) + remember);
+					remember = 0;
 				}
 			}
 			fillVector(a.container);
@@ -198,7 +202,7 @@ public:
 		}
 		return b;
 	}
-	BigInt operator +(BigInt& b1)
+	BigInt operator +(BigInt b1)
 	{
 		int remember = 0;
 		BigInt result;
@@ -221,20 +225,21 @@ public:
 		std::reverse(result.container.begin(), result.container.end());
 		return result;
 	}
-	BigInt operator -(BigInt& b1)
+	BigInt operator -(BigInt b1)
 	{
 		BigInt result;
+		BigInt Container(container);
 		result.container.clear();
 		for (std::size_t i = SIZE; i != 0; --i)
 		{
-			if (container[i] - b1.container[i] >= 0)
+			if (Container.container[i] - b1.container[i] >= 0)
 			{
-				result.container.push_back(container[i] - b1.container[i]);
+				result.container.push_back(Container.container[i] - b1.container[i]);
 			}
 			else
 			{
-				container[i - 1]  -= 1;
-				int a = 10 + container[i];
+				Container.container[i - 1] -= 1;
+				int a = 10 + Container.container[i];
 				result.container.push_back(a - b1.container[i]);
 			}
 		}
@@ -281,7 +286,7 @@ public:
 				x = i;
 		}
 		return container[x] < b.container[x];
-			
+
 	}
 	bool operator >(BigInt& b)
 	{
@@ -293,7 +298,7 @@ public:
 		}
 		return container[x] > b.container[x];
 	}
-	BigInt operator ^(BigInt& power)
+	BigInt operator ^(BigInt power)
 	{
 		BigInt result(1), one(1), two(2);
 		BigInt zero, number(container);
@@ -301,7 +306,7 @@ public:
 		{
 			if (power % two == one)
 				result = (result * number);
-			number = (number * number) ;
+			number = (number * number);
 			power = power / two;
 		}
 		return result;
@@ -309,8 +314,9 @@ public:
 	}
 	BigInt operator /(BigInt& b1)
 	{
+		bool finish = false;
 		BigInt result;
-		int it = firstDifferentNr(container)+1;
+		int it = firstDifferentNr(container) + 1;
 		BigInt a, multiple;
 		BigInt Container(container);
 		BigInt zero;
@@ -318,7 +324,7 @@ public:
 		bool getDownDigit = false;
 		while (true)
 		{
-			if (isEmpty(Container.container) == true && a < b1 && size==0)
+			if (isEmpty(Container.container) == true && a < b1 && size == 0 && finish == true)
 				break;
 			//if (size == 0)
 			//	break;
@@ -334,7 +340,7 @@ public:
 					//if (a != zero)
 					//{
 
-						--size;
+					--size;
 					//}
 					//if (size > 0 && a == zero)
 					//{
@@ -343,17 +349,18 @@ public:
 					//}
 					++it;
 				}
-				else 
+				else
 					break;
 				getDownDigit = true;
+				finish = false;
 			}
 			else
 			{
 				multiple = findMultiple(a, b1);
-				saveMultiple(result,multiple);
+				saveMultiple(result, multiple);
 				multiple = multiple * b1;
 				a = a - multiple;
-				
+
 				//eraseZerosFromBack(a.container);
 				//if (size > 0 && a == zero)
 					//if (_allZeros(SIZE - size - 2) == true)
@@ -361,12 +368,13 @@ public:
 					//	move(result.container, size);
 					//	size = 0;
 					//}
-				if (_allZeros(SIZE - size) == true &&  a==zero)
+				if (_allZeros(SIZE - size) == true && a == zero)
 				{
 					move(result.container, size);
 					size = 0;
 				}
 				getDownDigit = false;
+				finish = true;
 			}
 		}
 		return result;
@@ -415,24 +423,79 @@ public:
 			out << i;
 		}
 		return out;
-		
+
 	}
 
 	friend std::istream& operator >>(std::istream& in, BigInt& b)
 	{
 		b.container.clear();
 		std::string str;
+		std::vector<int> v;
 		in >> str;
 
 		for (auto& i : str)
 		{
 			if (i >= '0' && i <= '9')
-				b.container.push_back(i - 48);
+				v.push_back(i - 48);
 		}
-		for (int i = b.container.size() - 1; i < SIZE; ++i)
+		while ((b.container.size() + v.size()) - 1 < SIZE)
+		{
 			b.container.push_back(0);
-		std::reverse(b.container.begin(), b.container.end());
+		}
+		for (std::size_t i = 0; i < v.size(); ++i)
+		{
+			b.container.push_back(v[i]);
+		}
+		//std::reverse(b.container.begin(), b.container.end());
+		//for (int i = b.container.size() - 1; i < SIZE; ++i)
+		//	b.container.push_back(0);
 		return in;
 	}
-	
+
+
+	void randomNumber()
+	{
+		std::vector<int> oddNr{ 1,3,5,7 };
+		std::random_device device;
+		std::mt19937 generate(device());
+		std::uniform_int_distribution<int> distribution(0, 9);
+		std::uniform_int_distribution<int> distribution1(1, 9);
+		std::uniform_int_distribution<int> distribution2(1, 3);
+		container[2] = distribution1(generate);
+		for (std::size_t it = 3; it <= SIZE; ++it)
+		{
+			container[it] = distribution(generate);
+		}
+		container[SIZE - 1] = oddNr[distribution2(generate)];
+
+	}
+
+	BigInt sqrt()
+	{
+		//we will use binary search algorithml.
+		BigInt a, b(container), two(2);
+		BigInt Container(container);
+		BigInt mid1, one(1), result;
+		while (a < b || a == b)
+		{
+			mid1 = (a + b) / two;
+			if (mid1 * mid1 == Container)
+				return mid1;
+			if (mid1 * mid1 > Container)
+			{
+				b = mid1 - one;
+
+			}
+			else
+			{
+				a = mid1 + one;
+				result = mid1;
+			}
+
+		}
+		return result;
+	}
+
+
+
 };
