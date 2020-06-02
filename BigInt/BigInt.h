@@ -5,7 +5,7 @@
 #include <random>
 #include <vector>
 
-#define SIZE 10
+#define SIZE 200
 
 class BigInt
 {
@@ -149,7 +149,11 @@ public:
 	BigInt(std::vector<int>& v)
 	{
 		container.clear();
-		for (std::size_t i = 0; i <= SIZE; ++i)
+		while ((container.size() + v.size()) - 1 < SIZE)
+		{
+			container.push_back(0);
+		}
+		for (std::size_t i = 0; i < v.size(); ++i)
 		{
 			container.push_back(v[i]);
 		}
@@ -161,6 +165,7 @@ public:
 			container.push_back(i);
 		}
 	}
+
 	void print()
 	{
 		for (auto& i : container)
@@ -453,7 +458,24 @@ public:
 	}
 
 
-	void randomNumber()
+	void randomNumber(int size = SIZE - 2)
+	{
+		std::vector<int> oddNr{ 1,3,5,7 };
+		std::random_device device;
+		std::mt19937 generate(device());
+		std::uniform_int_distribution<int> distribution(0, 9);
+		std::uniform_int_distribution<int> distribution1(1, 9);
+		std::uniform_int_distribution<int> distribution2(0, 3);
+		for (std::size_t it = SIZE - size + 1; it <= SIZE; ++it)
+		{
+			container[it] = distribution(generate);
+		}
+		container[SIZE - size + 1] = distribution1(generate);
+		container[SIZE] = oddNr[distribution2(generate)];
+
+	}
+
+	void randomNumbermin(BigInt& b)
 	{
 		std::vector<int> oddNr{ 1,3,5,7 };
 		std::random_device device;
@@ -461,12 +483,12 @@ public:
 		std::uniform_int_distribution<int> distribution(0, 9);
 		std::uniform_int_distribution<int> distribution1(1, 9);
 		std::uniform_int_distribution<int> distribution2(1, 3);
-		container[2] = distribution1(generate);
-		for (std::size_t it = 3; it <= SIZE; ++it)
+		for (std::size_t it = actualSize(b.container) + 3; it <= SIZE; ++it)
 		{
 			container[it] = distribution(generate);
 		}
-		container[SIZE - 1] = oddNr[distribution2(generate)];
+		container[SIZE - actualSize(b.container)] = distribution1(generate);
+		container[SIZE] = oddNr[distribution2(generate)];
 
 	}
 
