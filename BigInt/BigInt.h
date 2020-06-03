@@ -5,7 +5,7 @@
 #include <random>
 #include <vector>
 
-#define SIZE 200
+#define SIZE 20
 
 class BigInt
 {

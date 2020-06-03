@@ -2,20 +2,6 @@
 
 BigInt one(1), two(2), zero;
 
-void initVector(std::vector<int>& v)
-{
-	for (std::size_t it = 0; it <= SIZE; ++it)
-		v.push_back(0);
-}
-
-void printVector(std::vector<int>& v)
-{
-	for (std::size_t it = 0; it <= SIZE; ++it)
-	{
-		std::cout << v[it];
-	}
-}
-
 BigInt power(BigInt x, BigInt y, BigInt p)
 {
 	BigInt result(1);
@@ -99,4 +85,18 @@ bool isPrimeClassic(BigInt& n)
 			return false;
 	}
 	return true;
+}
+
+void initVector(std::vector<int>& v)
+{
+	for (std::size_t it = 0; it <= SIZE; ++it)
+		v.push_back(0);
+}
+
+void printVector(std::vector<int>& v)
+{
+	for (std::size_t it = 0; it <= SIZE; ++it)
+	{
+		std::cout << v[it];
+	}
 }

@@ -26,5 +26,8 @@
     <ClInclude Include="Prim.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="RSA.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
