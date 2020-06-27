@@ -1,6 +1,6 @@
 #pragma once
 
-BigInt p(11), q(19), e(5), n, f, pOne, qOne;
+BigInt p(16553), q(14717), e(5), n, f, pOne, qOne;
 
 BigInt cmmdc(BigInt a, BigInt h)
 {
@@ -16,30 +16,79 @@ BigInt cmmdc(BigInt a, BigInt h)
 	}
 }
 
-BigInt find_d()
-{
-	BigInt d;
-	BigInt random_number(3);
-	BigInt result;
-	while (random_number < e || random_number == e)
-	{
-		d = random_number * f;
-		d = d + one;
-		d = d / e;
-
-		result.setBigInt(0);
-		result = d * e;
-		result = result % f;
-		if (result == one)
-			return d;
-		else
-			++random_number;
+BigInt gcd(BigInt a, BigInt b, BigInt& x, BigInt& y) {
+	//x = 1, y = 0;
+	x.setBigInt(1);
+	y.setBigInt(0);
+	BigInt x1(0), y1(1), a1(a), b1(b);
+	while (b1 != zero) {
+		BigInt q;
+		q = a1 / b1;
+		BigInt res;
+		res = q * x1;
+		res = x - res;
+		std::tie(x, x1) = std::make_tuple(x1, res);
+		res = q * y1;
+		res = y - res;
+		std::tie(y, y1) = std::make_tuple(y1, res);
+		res = q * b1;
+		res = a1 - res;
+		std::tie(a1, b1) = std::make_tuple(b1, res);
 	}
-
-	return result;
-	std::cout << "Nu s-a gasit d\n";
-
+	return a1;
 }
+
+BigInt find_d(BigInt a, BigInt m)
+{
+	BigInt x, y;
+	BigInt g;
+	g = gcd(a, m, x, y);
+	if (g != one)
+	{
+		g.setBigInt(0);
+		return g;
+	}
+	else
+	{
+		BigInt resultat;
+		resultat = x % m;
+		resultat = resultat + m;
+		resultat = resultat % m;
+		return resultat;
+	}
+}
+
+BigInt find_e()
+{
+	//while (e < f)
+	//{
+	//	if (cmmdc(e, f) == one)
+	//		break;
+	//	else
+	//		++e;
+	//}
+
+
+	BigInt a(-29), b(-11);
+	std::cout << a << std::endl;
+	std::cout << b << std::endl;
+	std::cout << a + b;
+
+	BigInt e;
+	while (e < f)
+	{
+
+		e.randomNumber(3);
+		while (isPrimeStatistic(e)==false)
+		{
+			++e;
+		}
+		if (isPrimeClassic(e) == true)
+			return e;
+	}
+	return one;
+}
+
 void RSA()
 {
 	bool pIsPrime = false, qIsPrime = false;
@@ -82,19 +131,13 @@ void RSA()
 	f = pOne * qOne;
 
 	//e.randomNumber(1);
-	while (e < f)
-	{
-		if (cmmdc(e, f) == one)
-			break;
-		else
-			++e;
-	}
+	e = find_e();
 
 	BigInt d;
-	d = find_d();
+	d = find_d(e, f);
 
 
-	BigInt message(26);
+	BigInt message(2);
 	std::cout << "\nmessage is: " << message << std::endl;
 
 	BigInt c;

@@ -1,36 +1,45 @@
-
-#pragma once
+#include<iostream>
 #include <string>
 #include <algorithm>
 #include <random>
 #include <vector>
 
-#define SIZE 320
+#define SIZE 10
 
 class BigInt
 {
 	std::vector<int> container;
 	bool isEmpty(std::vector<int>& v)
 	{
-		for (auto& i : v)
+		//for (auto& i : v)
+		//{
+		//	if (i != 0)
+		//		return false;
+		//}
+		for (std::vector<int>::iterator i = v.begin() + 1; i < v.end(); ++i)
 		{
-			if (i != 0)
+			if (*i != 0)
 				return false;
 		}
 		return true;
 	}
 	bool isEmpty(BigInt& Container)
 	{
-		for (auto& i : Container.container)
+		//for (auto& i : Container.container)
+		//{
+		//	if (i != 0)
+		//		return false;
+		//}
+		for (std::vector<int>::iterator i = Container.container.begin() + 1; i < Container.container.end(); ++i)
 		{
-			if (i != 0)
+			if (*i != 0)
 				return false;
 		}
 		return true;
 	}
 	int firstDifferentNr(std::vector<int>& v, int nr = 0)
 	{
-		for (int i = 0; i <= SIZE; ++i)
+		for (int i = 1; i <= SIZE; ++i)
 		{
 			if (v[i] != nr && v[i - 1] == nr)
 				return i - 1;
@@ -39,7 +48,7 @@ class BigInt
 	}
 	bool allZeros()
 	{
-		bool zeros = std::all_of(container.begin(), container.end(), [](int i) { return i == 0; });
+		bool zeros = std::all_of(container.begin() + 1, container.end(), [](int i) { return i == 0; });
 		return zeros;
 	}
 	bool _allZeros(int abegin = SIZE, int aend = SIZE)
@@ -64,7 +73,7 @@ class BigInt
 	{
 		std::vector<int> v2 = v1;
 		int k = -1;
-		for (int i = SIZE; i > 0; --i)
+		for (int i = SIZE; i > 1; --i)
 		{
 			if (v1[i] == 0)
 				k = i;
@@ -73,7 +82,7 @@ class BigInt
 		if (k != -1)
 		{
 			int j = k;
-			for (int i = SIZE; i > 0; --i)
+			for (int i = SIZE; i > 1; --i)
 			{
 				if (j >= 0)
 				{
@@ -119,15 +128,37 @@ class BigInt
 		for (int i = v.size() - 1; i < SIZE; ++i)
 			v.push_back(0);
 	}
+	bool isNegative = false;
+	void makeNegative()
+	{
+		isNegative = true;
+		container[0] = 1;
+	}
+	void makePositive()
+	{
+		isNegative = false;
+		container[0] = 0;
+	}
 public:
+	int size()
+	{
+		return SIZE - actualSize(container);
+	}
 	void setBigInt(int number = 0)
 	{
+		if (number < 0)
+		{
+			number *= -1;
+			isNegative = true;
+		}
 		while (container.size() <= SIZE)
 		{
 			container.push_back(number % 10);
 			number = number / 10;
 		}
 		std::reverse(container.begin(), container.end());
+		if (isNegative == true)
+			makeNegative();
 	}
 	void setBigInt(std::vector<int>& v)
 	{
@@ -139,12 +170,19 @@ public:
 	}
 	BigInt(int number = 0)
 	{
+		if (number < 0)
+		{
+			number *= -1;
+			isNegative = true;
+		}
 		while (container.size() <= SIZE)
 		{
 			container.push_back(number % 10);
 			number = number / 10;
 		}
 		std::reverse(container.begin(), container.end());
+		if (isNegative == true)
+			makeNegative();
 	}
 	BigInt(std::vector<int>& v)
 	{
@@ -157,6 +195,10 @@ public:
 		{
 			container.push_back(v[i]);
 		}
+		if (v[0] == 1)
+			this->makeNegative();
+		else
+			this->makePositive();
 	}
 	BigInt(BigInt& other)
 	{
@@ -164,13 +206,30 @@ public:
 		{
 			container.push_back(i);
 		}
+		if (other.isNegative == true)
+		{
+			this->makeNegative();
+		}
 	}
-
+	void swap(BigInt& a1, BigInt& b1)
+	{
+		BigInt aux(a1);
+		for (auto i = a1.container.begin(), j = b1.container.begin(); i != a1.container.end() || j != b1.container.end(); ++i, ++j)
+		{
+			*i = *j;
+		}
+		for (auto i = b1.container.begin(), j = aux.container.begin(); i != b1.container.end() || j != aux.container.end(); ++i, ++j)
+		{
+			*i = *j;
+		}
+	}
 	void print()
 	{
-		for (auto& i : container)
+		if (container[0] == 1)
+			std::cout << "-";
+		for (std::vector<int>::iterator i = container.begin() + 1; i < container.end(); ++i)
 		{
-			std::cout << i;
+			std::cout << *i;
 		}
 	}
 	BigInt operator *(BigInt b1)
@@ -178,12 +237,12 @@ public:
 		BigInt result;
 		int remember = 0;
 		BigInt a, b, c;
-		for (std::size_t i = SIZE; i > 0; --i)
+		for (std::size_t i = SIZE; i > 1; --i)
 		{
 			if (firstDifferentNr(b1.container) - 1 == i)
 				break;
 			a.container.clear();
-			for (std::size_t j = SIZE; j > 0; --j)
+			for (std::size_t j = SIZE; j > 1; --j)
 			{
 
 				if (firstDifferentNr(container) - 1 == j)
@@ -205,52 +264,141 @@ public:
 			move(a.container, SIZE - i);
 			b = b + a;
 		}
+		if ((b1.isNegative == true && this->isNegative == false) || (b1.isNegative == false && this->isNegative == true))
+			b.makeNegative();
 		return b;
 	}
 	BigInt operator +(BigInt b1)
 	{
-		int remember = 0;
-		BigInt result;
-		result.container.clear();
-		for (std::size_t i = SIZE; i > 0; --i)
+
+
+		BigInt res;
+		BigInt a1(container);
+		if (b1.isNegative == true && this->isNegative == false || b1.isNegative == false && this->isNegative == true)
 		{
-			if (b1.container[i] + container[i] + remember < 10)
+			bool b = false, a = false;
+			b = b1.isNegative;
+			a = a1.isNegative;
+			b1.makePositive();
+			a1.makePositive();
+			if (b1 > a1)
 			{
-				result.container.push_back(b1.container[i] + container[i] + remember);
-				remember = 0;
+
+				res = b1 - a1;
+				b1.isNegative = b;
+				a1.isNegative = a;
+				if (b1.isNegative == true)
+					res.makeNegative();
+				else
+					res.makePositive();
 			}
 			else
 			{
-				int a = b1.container[i] + container[i] + remember;
-				result.container.push_back(a % 10);
-				remember = a / 10;
+				res = a1 - b1;
+				b1.isNegative = b;
+				a1.isNegative = a;
+				if (this->isNegative == true)
+					res.makeNegative();
+				else
+					res.makePositive();
 			}
+			return res;
 		}
-		result.container.push_back(0);
-		std::reverse(result.container.begin(), result.container.end());
-		return result;
+		else
+		{
+
+			int remember = 0;
+			BigInt result;
+			result.container.clear();
+			for (std::size_t i = SIZE; i > 1; --i)
+			{
+				if (b1.container[i] + container[i] + remember < 10)
+				{
+					result.container.push_back(b1.container[i] + container[i] + remember);
+					remember = 0;
+				}
+				else
+				{
+					int a = b1.container[i] + container[i] + remember;
+					result.container.push_back(a % 10);
+					remember = a / 10;
+				}
+			}
+			result.container.push_back(0);
+			result.container.push_back(0);
+
+			std::reverse(result.container.begin(), result.container.end());
+			if (this->isNegative == true && b1.isNegative == true)
+				result.makeNegative();
+			return result;
+		}
 	}
 	BigInt operator -(BigInt b1)
 	{
-		BigInt result;
-		BigInt Container(container);
-		result.container.clear();
-		for (std::size_t i = SIZE; i != 0; --i)
+		BigInt a1(container);
+		BigInt res;
+		if (this->isNegative == true && b1.isNegative == true)
 		{
-			if (Container.container[i] - b1.container[i] >= 0)
-			{
-				result.container.push_back(Container.container[i] - b1.container[i]);
-			}
+			b1.makePositive();
+			res = a1 + b1;
+			b1.makeNegative();
+			if (a1 < b1)
+				res.makeNegative();
 			else
-			{
-				Container.container[i - 1] -= 1;
-				int a = 10 + Container.container[i];
-				result.container.push_back(a - b1.container[i]);
-			}
+				res.makePositive();
+			return res;
 		}
-		result.container.push_back(0);
-		std::reverse(result.container.begin(), result.container.end());
-		return result;
+		if (this->isNegative == false && b1.isNegative == true || this->isNegative == true && b1.isNegative == false)
+		{
+			bool b = false, a = false;
+			b = b1.isNegative;
+			a = a1.isNegative;
+			b1.makePositive();
+			a1.makePositive();
+			res = a1 + b1;
+			b1.isNegative = b;
+			a1.isNegative = a;
+			if (a1 > b1)
+				res.makeNegative();
+			else
+				res.makePositive();
+			return res;
+		}
+		else
+		{
+
+			BigInt result;
+			BigInt Container(container);
+			result.container.clear();
+			if (b1.isNegative == false && a1.isNegative == false && a1 < b1)
+			{
+
+				BigInt res;
+				res = b1 - a1;
+				res.makeNegative();
+				return res;
+			}
+			for (std::size_t i = SIZE; i != 1; --i)
+			{
+				if (Container.container[i] - b1.container[i] >= 0)
+				{
+					result.container.push_back(Container.container[i] - b1.container[i]);
+				}
+				else
+				{
+					Container.container[i - 1] -= 1;
+					int a = 10 + Container.container[i];
+					result.container.push_back(a - b1.container[i]);
+				}
+			}
+			result.container.push_back(0);
+			result.container.push_back(0);
+
+			std::reverse(result.container.begin(), result.container.end());
+			return result;
+
+
+		}
 	}
 	bool operator ==(BigInt& b1)
 	{
@@ -284,23 +432,31 @@ public:
 	}
 	bool operator <(BigInt& b)
 	{
+		if (b.isNegative == true && this->isNegative == false || b.isNegative == false && this->isNegative == true)
+			return container[0] > b.container[0];
 		int x = SIZE;
 		for (std::size_t i = SIZE; i > 0; --i)
 		{
 			if (container[i] != b.container[i])
 				x = i;
 		}
+		if (b.isNegative == true && this->isNegative == true)
+			return container[x] > b.container[x];
 		return container[x] < b.container[x];
 
 	}
 	bool operator >(BigInt& b)
 	{
+		if (b.isNegative == true && this->isNegative == false || b.isNegative == false && this->isNegative == true)
+			return container[0] < b.container[0];
 		int x = SIZE;
 		for (std::size_t i = SIZE; i > 0; --i)
 		{
 			if (container[i] != b.container[i])
 				x = i;
 		}
+		if (b.isNegative == true && this->isNegative == true)
+			return container[x] < b.container[x];
 		return container[x] > b.container[x];
 	}
 	BigInt operator ^(BigInt power)
@@ -319,6 +475,7 @@ public:
 	}
 	BigInt operator /(BigInt& b1)
 	{
+
 		bool finish = false;
 		BigInt result;
 		int it = firstDifferentNr(container) + 1;
@@ -327,12 +484,16 @@ public:
 		BigInt zero;
 		int size = SIZE - actualSize(Container.container);
 		bool getDownDigit = false;
+
+		bool bRem = false, aRem = false;
+		bRem = b1.isNegative;
+		aRem = Container.isNegative;
+		b1.makePositive();
+		Container.makePositive();
 		while (true)
 		{
 			if (isEmpty(Container.container) == true && a < b1 && size == 0 && finish == true)
 				break;
-			//if (size == 0)
-			//	break;
 			if (a < b1 && size > 0)
 			{
 				a.move(a.container, 1);
@@ -342,16 +503,10 @@ public:
 						move(result.container, 1);
 					a.container[SIZE] = Container.container[it];
 					Container.container[it] = 0;
-					//if (a != zero)
-					//{
+
 
 					--size;
-					//}
-					//if (size > 0 && a == zero)
-					//{
-					//		move(result.container, size);
-					//		size = 0;
-					//}
+
 					++it;
 				}
 				else
@@ -366,13 +521,6 @@ public:
 				multiple = multiple * b1;
 				a = a - multiple;
 
-				//eraseZerosFromBack(a.container);
-				//if (size > 0 && a == zero)
-					//if (_allZeros(SIZE - size - 2) == true)
-					//{
-					//	move(result.container, size);
-					//	size = 0;
-					//}
 				if (_allZeros(SIZE - size) == true && a == zero)
 				{
 					move(result.container, size);
@@ -382,6 +530,12 @@ public:
 				finish = true;
 			}
 		}
+		b1.isNegative = bRem;
+		Container.isNegative = aRem;
+		if (b1.isNegative == true && Container.isNegative == false || b1.isNegative == false && Container.isNegative == true)
+			result.makeNegative();
+		else
+			result.makePositive();
 		return result;
 	}
 
@@ -392,6 +546,12 @@ public:
 		BigInt a, multiple;
 		BigInt Container(container);
 		int size = SIZE - actualSize(Container.container);
+
+		bool bRem = false, aRem = false;
+		bRem = b1.isNegative;
+		aRem = Container.isNegative;
+		b1.makePositive();
+		Container.makePositive();
 
 		while (true)
 		{
@@ -419,13 +579,19 @@ public:
 
 			}
 		}
+		b1.isNegative = bRem;
+		Container.isNegative = aRem;
+		a.makePositive();
 		return a;
 	}
 	friend std::ostream& operator <<(std::ostream& out, const BigInt& b)
 	{
-		for (auto& i : b.container)
+
+		if (b.container[0] == 1)
+			out << "-";
+		for (int i = 1; i <= SIZE; ++i)
 		{
-			out << i;
+			out << b.container[i];
 		}
 		return out;
 
@@ -438,10 +604,16 @@ public:
 		std::vector<int> v;
 		in >> str;
 
-		for (auto& i : str)
+
+		int j;
+		if (str[0] == '-')
+			j = 1;
+		else
+			j = 0;
+		for (j; j < str.size(); ++j)
 		{
-			if (i >= '0' && i <= '9')
-				v.push_back(i - 48);
+			if (str[j] >= '0' && str[j] <= '9')
+				v.push_back(str[j] - 48);
 		}
 		while ((b.container.size() + v.size()) - 1 < SIZE)
 		{
@@ -451,9 +623,11 @@ public:
 		{
 			b.container.push_back(v[i]);
 		}
-		//std::reverse(b.container.begin(), b.container.end());
-		//for (int i = b.container.size() - 1; i < SIZE; ++i)
-		//	b.container.push_back(0);
+		if (str[0] == '-')
+		{
+			b.container[0] = 1;
+			b.makeNegative();
+		}
 		return in;
 	}
 
@@ -521,3 +695,4 @@ public:
 
 
 };
+
