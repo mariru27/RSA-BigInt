@@ -69,10 +69,7 @@ BigInt find_e()
 	//}
 
 
-	BigInt a(-29), b(-11);
-	std::cout << a << std::endl;
-	std::cout << b << std::endl;
-	std::cout << a + b;
+
 
 	BigInt e;
 	while (e < f)

@@ -3,19 +3,16 @@
 #include <algorithm>
 #include <random>
 #include <vector>
+#include <functional>
 
-#define SIZE 10
+#define SIZE 17
 
 class BigInt
 {
 	std::vector<int> container;
 	bool isEmpty(std::vector<int>& v)
 	{
-		//for (auto& i : v)
-		//{
-		//	if (i != 0)
-		//		return false;
-		//}
+
 		for (std::vector<int>::iterator i = v.begin() + 1; i < v.end(); ++i)
 		{
 			if (*i != 0)
@@ -25,11 +22,7 @@ class BigInt
 	}
 	bool isEmpty(BigInt& Container)
 	{
-		//for (auto& i : Container.container)
-		//{
-		//	if (i != 0)
-		//		return false;
-		//}
+
 		for (std::vector<int>::iterator i = Container.container.begin() + 1; i < Container.container.end(); ++i)
 		{
 			if (*i != 0)
@@ -146,6 +139,7 @@ public:
 	}
 	void setBigInt(int number = 0)
 	{
+		container.clear();
 		if (number < 0)
 		{
 			number *= -1;
@@ -337,21 +331,40 @@ public:
 	{
 		BigInt a1(container);
 		BigInt res;
-		if (this->isNegative == true && b1.isNegative == true)
+		bool resultOp = true;
+		if (b1.isNegative == true)
 		{
+			resultOp = false;
+		}
+		else
+		{
+			resultOp = true;
+		}
+		if (this->isNegative == true && resultOp == true)
+		{
+			a1.makePositive();
 			b1.makePositive();
 			res = a1 + b1;
 			b1.makeNegative();
-			if (a1 < b1)
-				res.makeNegative();
-			else
-				res.makePositive();
+			res.makeNegative();
 			return res;
 		}
-		if (this->isNegative == false && b1.isNegative == true || this->isNegative == true && b1.isNegative == false)
+		if (a1.isNegative == true && resultOp == false)
+		{
+			bool b;
+			b = b1.isNegative;
+			a1.makePositive();
+			b1.makePositive();
+			BigInt res;
+			res = b1 - a1;
+			b1.isNegative = b;
+			a1.makeNegative();
+			return res;
+		}
+		if (this->isNegative == false && b1.isNegative == true || b1.isNegative && resultOp == false)
 		{
 			bool b = false, a = false;
-			b = b1.isNegative;
+			b = resultOp;
 			a = a1.isNegative;
 			b1.makePositive();
 			a1.makePositive();
@@ -359,9 +372,9 @@ public:
 			b1.isNegative = b;
 			a1.isNegative = a;
 			if (a1 > b1)
-				res.makeNegative();
+				res.isNegative = a;
 			else
-				res.makePositive();
+				res.isNegative = resultOp;
 			return res;
 		}
 		else
@@ -470,6 +483,8 @@ public:
 			number = (number * number);
 			power = power / two;
 		}
+		if (power % two != zero && power.isNegative == true)
+			result.makeNegative();
 		return result;
 
 	}
@@ -695,4 +710,3 @@ public:
 
 
 };
-
