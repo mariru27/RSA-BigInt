@@ -1,23 +1,9 @@
 #pragma once
 
-BigInt p(16553), q(14717), e(5), n, f, pOne, qOne;
-
-BigInt cmmdc(BigInt a, BigInt h)
-{
-	//check if a is coprime with h
-	BigInt temp;
-	while (true)
-	{
-		temp = a % h;
-		if (temp == zero)
-			return h;
-		a = h;
-		h = temp;
-	}
-}
+BigInt p(58991), q(54851), e, n, f, pOne, qOne;
+BigInt d;
 
 BigInt gcd(BigInt a, BigInt b, BigInt& x, BigInt& y) {
-	//x = 1, y = 0;
 	x.setBigInt(1);
 	y.setBigInt(0);
 	BigInt x1(0), y1(1), a1(a), b1(b);
@@ -60,22 +46,10 @@ BigInt find_d(BigInt a, BigInt m)
 
 BigInt find_e()
 {
-	//while (e < f)
-	//{
-	//	if (cmmdc(e, f) == one)
-	//		break;
-	//	else
-	//		++e;
-	//}
-
-
-
-
 	BigInt e;
 	while (e < f)
 	{
-
-		e.randomNumber(3);
+		e.randomNumber(5);
 		while (isPrimeStatistic(e)==false)
 		{
 			++e;
@@ -86,11 +60,45 @@ BigInt find_e()
 	return one;
 }
 
+BigInt modularExponentation(BigInt a, BigInt b, BigInt c)
+{
+	if (b == zero)
+	{
+		return one;
+	}
+	else if (b % two == zero)
+	{
+		BigInt d = modularExponentation(a, b / two, c);
+		BigInt z = d * d;
+		z = z % c;
+		return z;
+	}
+	else {
+		BigInt z = a % c;
+		z = z * modularExponentation(a, b - one, c);
+		z = z % c;
+
+		return z;
+	}
+}
+
+
+void encryptAndDecrypt(BigInt m)
+{
+	BigInt c, dec;
+	m.setBigInt(1241);
+	std::cout << "message: " << m << std::endl;
+	c = modularExponentation(m, e, n);
+	std::cout << "encypted meeage: " << c;
+	dec  = modularExponentation(c, d, n);
+	std::cout << std::endl << "decrypted message: " << dec;
+}
+
 void RSA()
 {
 	bool pIsPrime = false, qIsPrime = false;
 
-	//int numberOfDigits = 2;
+	//int numberOfDigits = 5;
 	//while (pIsPrime == false && qIsPrime == false)
 	//{
 	//	//find p, a prime number
@@ -98,6 +106,7 @@ void RSA()
 	//	while (isPrimeStatistic(p) == false)
 	//	{
 	//		p.randomNumber(numberOfDigits);
+	//		
 	//	}
 	//	std::cout << "am gasit un numar care este posibil prim, acum o sa verific daca este prim";
 	//	if (isPrimeClassic(p))
@@ -122,29 +131,22 @@ void RSA()
 	//	else
 	//		std::cout << "\nAcest numar nu este prim: " << q;
 	//}
+
 	n = p * q;
+	std::cout<< "n = " << n <<std::endl;
 	pOne = p - one;
 	qOne = q - one;
 	f = pOne * qOne;
+	std::cout<< "f = " << f <<std::endl;
 
-	//e.randomNumber(1);
 	e = find_e();
+	std::cout<< "e = " << e <<std::endl;
 
-	BigInt d;
 	d = find_d(e, f);
+	std::cout<< "d = " << d <<std::endl;
 
 
-	BigInt message(2);
-	std::cout << "\nmessage is: " << message << std::endl;
+	BigInt message(3837);
+	encryptAndDecrypt(message);
 
-	BigInt c;
-	c = message ^ e;
-	c = c % n;
-	std::cout << "mesajul criptat: " << c << std::endl;
-
-	BigInt m;
-	m = c ^ d;
-	m = m % n;
-
-	std::cout << "mesajul dupa decriptare este: " << m << std::endl;
 }

@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 
-#define SIZE 17
+#define SIZE 60
 
 class BigInt
 {
@@ -194,7 +194,7 @@ public:
 		else
 			this->makePositive();
 	}
-	BigInt(BigInt& other)
+	BigInt(const BigInt& other)
 	{
 		for (auto& i : other.container)
 		{
@@ -205,6 +205,7 @@ public:
 			this->makeNegative();
 		}
 	}
+
 	void swap(BigInt& a1, BigInt& b1)
 	{
 		BigInt aux(a1);
@@ -596,7 +597,10 @@ public:
 		}
 		b1.isNegative = bRem;
 		Container.isNegative = aRem;
-		a.makePositive();
+		if (Container.isNegative == true)
+			a.makeNegative();
+		else
+			a.makePositive();
 		return a;
 	}
 	friend std::ostream& operator <<(std::ostream& out, const BigInt& b)
