@@ -12,11 +12,6 @@
 int main()
 {
 	RSA();
-
-	//std::string message{ "my message" };
-	//std::size_t str_hash = std::hash<std::string>{}(message);
-	//std::cout << str_hash << std::endl;
-
 }
 
 

@@ -137,6 +137,71 @@ public:
 	{
 		return SIZE - actualSize(container);
 	}
+	int getValue(int pos = 0)
+	{
+		return container[pos];
+	}
+	void setBigInt(std::string str)
+	{
+		
+		container.clear();
+		std::vector<int> v;
+
+		int j;
+		if (str[0] == '-')
+			j = 1;
+		else
+			j = 0;
+		for (j; j < str.size(); ++j)
+		{
+			if (str[j] >= '0' && str[j] <= '9')
+				v.push_back(str[j] - 48);
+		}
+		while ((container.size() + v.size()) - 1 < SIZE)
+		{
+			container.push_back(0);
+		}
+		for (std::size_t i = 0; i < v.size(); ++i)
+		{
+			container.push_back(v[i]);
+		}
+		if (str[0] == '-')
+		{
+			container[0] = 1;
+			makeNegative();
+		}
+	}
+	BigInt(std::string str)
+	{
+
+		container.clear();
+		std::vector<int> v;
+
+		int j;
+		if (str[0] == '-')
+			j = 1;
+		else
+			j = 0;
+		for (j; j < str.size(); ++j)
+		{
+			if (str[j] >= '0' && str[j] <= '9')
+				v.push_back(str[j] - 48);
+		}
+		while ((container.size() + v.size()) - 1 < SIZE)
+		{
+			container.push_back(0);
+		}
+		for (std::size_t i = 0; i < v.size(); ++i)
+		{
+			container.push_back(v[i]);
+		}
+		if (str[0] == '-')
+		{
+			container[0] = 1;
+			makeNegative();
+		}
+	}
+
 	void setBigInt(int number = 0)
 	{
 		container.clear();

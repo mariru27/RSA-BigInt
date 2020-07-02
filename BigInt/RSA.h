@@ -1,7 +1,11 @@
 #pragma once
 
-BigInt p(58991), q(54851), e, n, f, pOne, qOne;
+BigInt p, q, e, n, f, pOne, qOne;
 BigInt d;
+
+std::vector<std::string> blocks;
+
+
 
 BigInt gcd(BigInt a, BigInt b, BigInt& x, BigInt& y) {
 	x.setBigInt(1);
@@ -82,58 +86,150 @@ BigInt modularExponentation(BigInt a, BigInt b, BigInt c)
 	}
 }
 
-
-void encryptAndDecrypt(BigInt m)
+template <class T>
+std::vector<BigInt> encryptAndDecrypt(std::vector<T> v, BigInt exponent, BigInt n)
 {
-	BigInt c, dec;
-	m.setBigInt(1241);
-	std::cout << "message: " << m << std::endl;
-	c = modularExponentation(m, e, n);
-	std::cout << "encypted meeage: " << c;
-	dec  = modularExponentation(c, d, n);
-	std::cout << std::endl << "decrypted message: " << dec;
+	std::vector<BigInt> resultedBlocks;
+
+	for (auto it = v.begin(); it != v.end(); ++it)
+	{
+		resultedBlocks.push_back(modularExponentation(*it, exponent, n));
+	}
+	return resultedBlocks;
 }
+
+std::string fromSizeToString(std::size_t size)
+{
+	std::string str;
+	int n;
+	while (size != 0)
+	{
+		char s = size % 10;
+		s += '0';
+		str.push_back(s);
+		size /= 10;
+	}
+	std::reverse(str.begin(), str.end());
+	return str;
+}
+
+void combineBlocks(std::string str)
+{
+	int i = 0;
+	std::string block;
+	for (auto it = str.begin(); it != str.end(); ++it)
+	{
+		if (i == 4)
+		{
+			i = 0;
+			blocks.push_back(block);
+			block.clear();
+		}
+		++i;
+		int a = (*it) - ' ';
+		std::string s = std::to_string(a);
+		
+		if (a <= 9)
+		{
+			block += '0';
+		}
+		block += s;
+	}
+	while (block.size() < 8)
+	{
+		block += '00';
+	}
+	blocks.push_back(block);
+}
+
+std::string devideBlocks(std::vector<BigInt> v, bool hash = false)
+{
+	std::string message;
+	int size = SIZE - 7;
+	for (auto it = v.begin(); it != v.end(); ++it)
+	{
+		for (auto i = size; i < SIZE ; i = i + 2)
+		{
+			int a = (*it).getValue(i);
+			int b = (*it).getValue(i + 1);
+			if (hash == true && a == 0 && b == 0)
+				return message;
+			if (a == 0)
+			{
+				b += ' ';
+				char c = b;
+				std::cout << c;
+				message.push_back(c);
+			}
+			else
+			{
+				a *= 10;
+				a += b;
+				a += ' ';
+				char c = a;
+				std::cout << c;
+				message.push_back(c);
+			}
+		}
+	}
+	return message;
+	
+}
+
+
+template <class T>
+void print(std::vector<T> v)
+{
+	std::vector<BigInt> resultedBlocks;
+	std::cout << "---------------------------------------------------------------------\n";
+	for (auto it = v.begin(); it != v.end(); ++it)
+	{
+		std::cout << (*it) << std::endl;
+	}
+}
+
+
 
 void RSA()
 {
 	bool pIsPrime = false, qIsPrime = false;
 
-	//int numberOfDigits = 5;
-	//while (pIsPrime == false && qIsPrime == false)
-	//{
-	//	//find p, a prime number
-	//	p.randomNumber(numberOfDigits);
-	//	while (isPrimeStatistic(p) == false)
-	//	{
-	//		p.randomNumber(numberOfDigits);
-	//		
-	//	}
-	//	std::cout << "am gasit un numar care este posibil prim, acum o sa verific daca este prim";
-	//	if (isPrimeClassic(p))
-	//	{
-	//		std::cout << "\nNumarul prim \"p\" este: " << p;
-	//		pIsPrime = true;
-	//	}
-	//	else
-	//		std::cout << "\nAcest numar nu este prim: " << p;
-	//	//find q, a prime number
-	//	q.randomNumber(numberOfDigits);
-	//	while (isPrimeStatistic(q) == false)
-	//	{
-	//		q.randomNumber(numberOfDigits);
-	//	}
-	//	std::cout << "\nam gasit un numar care este posibil prim, acum o sa verific daca este prim";
-	//	if (isPrimeClassic(p))
-	//	{
-	//		std::cout << "\nNumarul prim \"q\" este: " << q;
-	//		qIsPrime = true;
-	//	}
-	//	else
-	//		std::cout << "\nAcest numar nu este prim: " << q;
-	//}
+	int numberOfDigits = 6;
+	while (pIsPrime == false && qIsPrime == false)
+	{
+		//find p, a prime number
+		p.randomNumber(numberOfDigits);
+		while (isPrimeStatistic(p) == false)
+		{
+			p.randomNumber(numberOfDigits);
+			
+		}
+		std::cout << "I found a number that is possible prime:";
+		if (isPrimeClassic(p))
+		{
+			std::cout << "\nPrime number \"p\" is: " << p;
+			pIsPrime = true;
+		}
+		else
+			std::cout << "\nThis number is not prime: " << p;
+		//find q, a prime number
+		q.randomNumber(numberOfDigits);
+		while (isPrimeStatistic(q) == false)
+		{
+			q.randomNumber(numberOfDigits);
+		}
+		std::cout << "\nI found a number that is possible prime";
+		if (isPrimeClassic(p))
+		{
+			std::cout << "\nPrime number \"q\" is: " << q;
+			qIsPrime = true;
+		}
+		else
+			std::cout << "\nThis number is not prime: " << q;
+	}
 
 	n = p * q;
-	std::cout<< "n = " << n <<std::endl;
+	std::cout<< "\nn = " << n <<std::endl;
 	pOne = p - one;
 	qOne = q - one;
 	f = pOne * qOne;
@@ -145,8 +241,58 @@ void RSA()
 	d = find_d(e, f);
 	std::cout<< "d = " << d <<std::endl;
 
+	std::string message;
+	std::cout << "Enter the message you want to send to Bob: ";
+	getline(std::cin, message);
+	combineBlocks(message);
+	std::cout << "blocks: ";
+	print(blocks);
+	
 
-	BigInt message(3837);
-	encryptAndDecrypt(message);
+	std::cout << "\nNow we will encrypt this message(with private key) using RSA alghoritm:\n ";
+	std::vector<BigInt> encryptedBlocks = encryptAndDecrypt(blocks, d, n);
+	std::cout << "encrypted blocks: ";
+	print(encryptedBlocks);
+	blocks.clear();
 
+	std::string HashMessage{ message };
+	std::size_t str_hash = std::hash<std::string>{}(HashMessage);
+	std::cout << "Hash message: " << str_hash << std::endl;
+	std::string HashMessage1 = fromSizeToString(str_hash);
+	combineBlocks(HashMessage1);
+	std::cout << "blocks: ";
+	print(blocks);
+
+	std::cout << "\nNow we will encrypt this Hash message(with private key) using RSA algorithm:\n ";
+	std::vector<BigInt> encryptedHashBlocks = encryptAndDecrypt(blocks, d, n);
+	std::cout << "encrypted Hash blocks: ";
+	print(encryptedHashBlocks);
+
+
+	std::cout << "\nNow Bob will decrypt this encrypted message, and Hash message(with your public key) using RSA algorithm:\n ";
+	std::vector<BigInt> decryptedBlocks = encryptAndDecrypt(encryptedBlocks, e, n);
+	std::cout << "decrypted bloks: ";
+	print(decryptedBlocks);
+
+	std::cout << "Decypt hash message blocks: ";
+	std::vector<BigInt> decryptedHashBlocks = encryptAndDecrypt(encryptedHashBlocks, e, n);
+	std::cout << "decrypted Hash blocks: ";
+	print(decryptedHashBlocks);
+
+	std::cout << "\ndecrypted message: ";
+	std::string receivedMessage = devideBlocks(decryptedBlocks);
+
+	std::cout << "\ndecrypted Hash message: ";
+	std::string receivedHashMessage = devideBlocks(decryptedHashBlocks, true);
+	std::cout << "\nNow Bob will verify if this message come from you, he will hash this message(that has been decrypted by Bob with your public key)\nand compare obtained hash with your hash(which you sent)";
+	
+	std::size_t str_hashMessage = std::hash<std::string>{}(HashMessage);
+	std::cout << "\nmessage: " << receivedMessage << " <----------------> Hash message: " << str_hashMessage;
+
+	std::cout << std::endl;
+	std::string resultHash = fromSizeToString(str_hashMessage);
+	if (resultHash == receivedHashMessage)
+		std::cout << std::endl << "The message was sent by you(the hash i received and calculated are the same)" << std::endl;
+	else
+		std::cout << std::endl << "The message has been modified(the hash i received and calculated are different)" << std::endl;
 }
