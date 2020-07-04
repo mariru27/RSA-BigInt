@@ -152,8 +152,6 @@ std::string devideBlocks(std::vector<BigInt> v, bool hash = false)
 		{
 			int a = (*it).getValue(i);
 			int b = (*it).getValue(i + 1);
-			if (hash == true && a == 0 && b == 0)
-				return message;
 			if (a == 0)
 			{
 				b += ' ';
@@ -171,6 +169,16 @@ std::string devideBlocks(std::vector<BigInt> v, bool hash = false)
 				message.push_back(c);
 			}
 		}
+	}
+	if (hash == true)
+	{
+		std::string hashMessage;
+		for (auto it = message.begin(); it != message.end(); ++it)
+		{
+			if ((*it) != ' ')
+				hashMessage.push_back(*it);
+		}
+		return hashMessage;
 	}
 	return message;
 	
@@ -195,6 +203,7 @@ void RSA()
 	bool pIsPrime = false, qIsPrime = false;
 
 	int numberOfDigits = 6;
+	std::cout << "You need to wait  ......\n";
 	while (pIsPrime == false && qIsPrime == false)
 	{
 		//find p, a prime number
